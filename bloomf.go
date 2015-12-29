@@ -121,6 +121,14 @@ func (bf *BF) Compress() {
 	bf.filter = row
 }
 
+// Reset clears the bloom filter
+func (bf *BF) Reset() {
+	for i := range bf.filter {
+		bf.filter[i] = 0
+	}
+	bf.count = 0
+}
+
 // Internal routines for the bit vector
 type bitvector []uint64
 
