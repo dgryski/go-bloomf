@@ -59,22 +59,23 @@ func New(capacity int, falsePositiveRate float64, hasher func([]byte) uint64) *B
 	}
 }
 
-// Insert inserts the byte array b into the bloom filter.  If the function
-// returns false, the capacity of the bloom filter has been reached.  Further
-// inserts will increase the rate of false positives.
+func (bf *BF) Len() int { return bf.count }
+func (bf *BF) Cap() int { return bf.n }
+
+// Insert inserts the byte array b into the bloom filter.  Returns true if the value
+// was already considered to be in the bloom filter.  Increments if the count if it was not.
 func (bf *BF) Insert(b []byte) bool {
-
-	bf.count++
-
 	h := bf.hash(b)
-
 	h1, h2 := uint32(h), uint32(h>>32)
-
+	var o uint = 1
 	for i := uint32(0); i < bf.k; i++ {
-		bf.filter.set((h1 + (i * h2)) & (bf.m - 1))
+		o &= bf.filter.getset((h1 + (i * h2)) & (bf.m - 1))
 	}
-
-	return bf.count < bf.n
+	if o == 1 {
+		return true
+	}
+	bf.count++
+	return false
 }
 
 // Lookup checks the bloom filter for the byte array b
@@ -138,7 +139,6 @@ func newbv(size uint32) bitvector {
 
 // get bit 'bit' in the bitvector d
 func (b bitvector) get(bit uint32) uint {
-
 	shift := bit % 64
 	bb := b[bit/64]
 	bb &= (1 << shift)
@@ -149,6 +149,16 @@ func (b bitvector) get(bit uint32) uint {
 // set bit 'bit' in the bitvector d
 func (b bitvector) set(bit uint32) {
 	b[bit/64] |= (1 << (bit % 64))
+}
+
+// set bit 'bit' in the bitvector d and return previous value
+func (b bitvector) getset(bit uint32) uint {
+	shift := bit % 64
+	idx := bit / 64
+	bb := b[idx]
+	m := uint64(1) << shift
+	b[idx] |= m
+	return uint((bb & m) >> shift)
 }
 
 // return the integer >= i which is a power of two
