@@ -71,11 +71,8 @@ func (bf *BF) Insert(b []byte) bool {
 	for i := uint32(0); i < bf.k; i++ {
 		o &= bf.filter.getset((h1 + (i * h2)) & (bf.m - 1))
 	}
-	if o == 1 {
-		return true
-	}
-	bf.count++
-	return false
+	bf.count += 1 - int(o)
+	return o == 1
 }
 
 // Lookup checks the bloom filter for the byte array b
