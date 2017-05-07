@@ -25,7 +25,6 @@ type BF struct {
 	hash   func([]byte) uint64
 }
 
-func (bf *BF) Count() int { return bf.count }
 // FilterBits returns the number of bits required for the desired capacity and
 // false positive rate.
 func FilterBits(capacity int, falsePositiveRate float64) uint32 {
