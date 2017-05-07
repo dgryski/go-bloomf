@@ -15,7 +15,7 @@ import (
 	"math"
 )
 
-// Internal struct for our bloom filter
+// BF is a bloom filter
 type BF struct {
 	m      uint32    // size of bit vector in bits
 	n      int       // capacity of the bloom filter
@@ -26,8 +26,7 @@ type BF struct {
 }
 
 func (bf *BF) Count() int { return bf.count }
-
-// filterBits returns the number of bits required for the desired capacity and
+// FilterBits returns the number of bits required for the desired capacity and
 // false positive rate.
 func FilterBits(capacity int, falsePositiveRate float64) uint32 {
 	bits := float64(capacity) * -math.Log(falsePositiveRate) / (math.Log(2.0) * math.Log(2.0)) // in bits
@@ -59,7 +58,10 @@ func New(capacity int, falsePositiveRate float64, hasher func([]byte) uint64) *B
 	}
 }
 
+// Len is the number of items inserted into the filter
 func (bf *BF) Len() int { return bf.count }
+
+// Cap is the total capacity of the filter
 func (bf *BF) Cap() int { return bf.n }
 
 // Insert inserts the byte array b into the bloom filter.  Returns true if the value
