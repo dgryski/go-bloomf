@@ -17,10 +17,10 @@ import (
 
 // BF is a bloom filter
 type BF struct {
-	m      uint32    // size of bit vector in bits
 	n      int       // capacity of the bloom filter
-	k      uint32    // distinct hash functions needed
 	count  int       // number of elements which have been inserted
+	m      uint32    // size of bit vector in bits
+	k      uint32    // distinct hash functions needed
 	filter bitvector // our filter bit vector
 	hash   func([]byte) uint64
 }
